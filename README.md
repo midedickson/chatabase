@@ -1,8 +1,8 @@
 # Chatabase
 
-**Quick Query Generator for Charts**
+**Quick Query Builder for Charts**
 
-Chatabase is a Go package that provides a powerful and flexible way to generate SQL queries for chart data visualization. It transforms declarative chart configurations into optimized SQL queries with proper NULL handling, boolean comparisons, and complex filtering capabilities.
+Chatabase is a Go package that provides a powerful and flexible way to build SQL queries for chart data visualization. It transforms declarative chart configurations into optimized SQL queries with proper NULL handling, boolean comparisons, and complex filtering capabilities.
 
 ## Features
 
