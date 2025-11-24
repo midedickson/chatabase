@@ -44,7 +44,7 @@ func ScanDynamicChart(rows *sqlx.Rows) ([]ChartDataRow, error) {
 
 	for rows.Next() {
 		// Create slice to hold all values (x + all y values)
-		values := make([]interface{}, len(columns))
+		values := make([]interface{}, len(columns)-1)
 		valuePtrs := make([]interface{}, len(columns))
 
 		// Create pointers to the values
