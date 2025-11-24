@@ -2,8 +2,9 @@ package chatabase
 
 import (
 	"database/sql/driver"
-	"github.com/jmoiron/sqlx"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type ChartDataRow struct {
@@ -31,7 +32,7 @@ func (row *ChartDataRow) GetYValueAsFloat(index int) *float64 {
 	}
 }
 
-// ScanDynamicChart scans chart data with unknown number of Y-values
+// ScanDynamicChart scans chart data with an unknown number of Y-values
 func ScanDynamicChart(rows *sqlx.Rows) ([]ChartDataRow, error) {
 	// Get column information
 	columns, err := rows.Columns()
