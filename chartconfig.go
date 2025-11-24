@@ -51,13 +51,16 @@ type AxisConfig struct {
 	Aggregation string `json:"aggregation"`      // "SUM", "COUNT", "AVG", "MIN", "MAX"
 	DataType    string `json:"data_type"`        // "numeric", "datetime", "string"
 	Format      string `json:"format,omitempty"` // "currency", "percentage", "date"
+	Alias       string `json:"alias,omitempty"`  // NEW
 }
 
 type FilterConfig struct {
-	Column   string        `json:"column"`
-	Operator string        `json:"operator"` // "=", "!=", ">", "<", ">=", "<=", "IN", "LIKE", "BETWEEN"
-	Value    interface{}   `json:"value"`
-	Values   []interface{} `json:"values,omitempty"` // For IN operator
+	Column    string        `json:"column"`
+	Operator  string        `json:"operator"` // "=", "!=", ">", "<", ">=", "<=", "IN", "LIKE", "BETWEEN"
+	Value     interface{}   `json:"value"`
+	Values    []interface{} `json:"values,omitempty"` // For IN operator
+	Raw       string        // NEW: if set, use as-is (with placeholders)
+	RawValues []interface{} // NEW: bind params for Raw
 }
 
 type OrderConfig struct {
@@ -281,6 +284,9 @@ func validateJoinConfig(join *JoinConfig, tableIndex, joinIndex int) error {
 
 // validateFilter validates a filter configuration
 func validateFilter(filter *FilterConfig, index int) error {
+	if filter.Raw != "" {
+		return nil
+	}
 	if filter.Column == "" {
 		return fmt.Errorf("filter column is required at index %d", index)
 	}

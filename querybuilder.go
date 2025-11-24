@@ -21,12 +21,12 @@ func BuildChartQuery(config *ChartConfig) (string, []interface{}, error) {
 	}
 
 	// Y-axis (multiple series support)
-	for i, yAxis := range config.YAxis {
+	for _, yAxis := range config.YAxis {
 		query.WriteString(", ")
 		if yAxis.Aggregation != "" {
-			query.WriteString(fmt.Sprintf("%s(%s) as y_value_%d", yAxis.Aggregation, yAxis.Column, i))
+			query.WriteString(fmt.Sprintf("%s(%s) as %s", yAxis.Aggregation, yAxis.Column, yAxis.Alias))
 		} else {
-			query.WriteString(fmt.Sprintf("%s as y_value_%d", yAxis.Column, i))
+			query.WriteString(fmt.Sprintf("%s as %s", yAxis.Column, yAxis.Alias))
 		}
 	}
 
@@ -53,6 +53,20 @@ func BuildChartQuery(config *ChartConfig) (string, []interface{}, error) {
 		for i, filter := range config.Filters {
 			if i > 0 {
 				query.WriteString(" AND ")
+			}
+
+			// 🌟 NEW: raw predicate support
+			if filter.Raw != "" {
+				// recommended: write Raw with '?' placeholders and we convert them to $1, $2,...
+				processedRaw := replaceQuestionMarksWithDollarPlaceholders(filter.Raw, &argIndex)
+				query.WriteString(processedRaw)
+
+				// append RawValues in order
+				for _, v := range filter.RawValues {
+					args = append(args, v)
+				}
+				// argIndex was already bumped inside helper
+				continue
 			}
 
 			switch strings.ToLower(filter.Operator) {
@@ -257,4 +271,17 @@ func BuildChartQuery(config *ChartConfig) (string, []interface{}, error) {
 	}
 
 	return query.String(), args, nil
+}
+
+func replaceQuestionMarksWithDollarPlaceholders(raw string, argIndex *int) string {
+	var b strings.Builder
+	for _, ch := range raw {
+		if ch == '?' {
+			b.WriteString(fmt.Sprintf("$%d", *argIndex))
+			*argIndex++
+		} else {
+			b.WriteRune(ch)
+		}
+	}
+	return b.String()
 }
