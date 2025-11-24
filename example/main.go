@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/midedickson/chatabase"
-	"log"
 )
 
 func main() {
@@ -45,9 +46,7 @@ func main() {
 		// Access the data
 		for _, row := range data {
 			fmt.Printf("Date: %v\n", row.XValue)
-			for i, yVal := range row.YValues {
-				fmt.Printf("  Y%d: %v\n", i, yVal)
-			}
+			fmt.Printf("  Y: %v\n", row.YValues)
 		}
 	}
 

@@ -8,29 +8,29 @@ import (
 )
 
 type ChartDataRow struct {
-	XValue  interface{}   `json:"x_value"`
-	YValues []interface{} `json:"y_values"`
+	XValue  interface{} `json:"x_value"`
+	YValues interface{} `json:"y_values"` // this removes being boxed to an array of values, we can use maps
 }
 
 // GetYValueAsFloat gets a Y-value as float64 with null safety
-func (row *ChartDataRow) GetYValueAsFloat(index int) *float64 {
-	if index >= len(row.YValues) || row.YValues[index] == nil {
-		return nil
-	}
-
-	switch v := row.YValues[index].(type) {
-	case float64:
-		return &v
-	case int64:
-		f := float64(v)
-		return &f
-	case int:
-		f := float64(v)
-		return &f
-	default:
-		return nil
-	}
-}
+//func (row *ChartDataRow) GetYValueAsFloat(index int) *float64 {
+//	if index >= len(row.YValues) || row.YValues[index] == nil {
+//		return nil
+//	}
+//
+//	switch v := row.YValues[index].(type) {
+//	case float64:
+//		return &v
+//	case int64:
+//		f := float64(v)
+//		return &f
+//	case int:
+//		f := float64(v)
+//		return &f
+//	default:
+//		return nil
+//	}
+//}
 
 // ScanDynamicChart scans chart data with an unknown number of Y-values
 func ScanDynamicChart(rows *sqlx.Rows) ([]ChartDataRow, error) {
@@ -67,11 +67,9 @@ func ScanDynamicChart(rows *sqlx.Rows) ([]ChartDataRow, error) {
 			XValue:  values[0],  // First column is always x_value
 			YValues: values[1:], // Rest are y_values
 		}
-		yValues := make([]interface{}, len(columns)-1)
-		for i := range yValues {
-			yValues[i] = map[string]interface{}{
-				columns[i+1]: values[i+1],
-			}
+		yValues := map[string]interface{}{}
+		for i, v := range values[1:] {
+			yValues[columns[i+1]] = v
 		}
 		row.YValues = yValues
 		results = append(results, row)
