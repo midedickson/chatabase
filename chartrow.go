@@ -67,7 +67,13 @@ func ScanDynamicChart(rows *sqlx.Rows) ([]ChartDataRow, error) {
 			XValue:  values[0],  // First column is always x_value
 			YValues: values[1:], // Rest are y_values
 		}
-
+		yValues := make([]interface{}, len(columns))
+		for i := range yValues {
+			yValues[i] = map[string]interface{}{
+				columns[i+1]: values[i+1],
+			}
+		}
+		row.YValues = yValues
 		results = append(results, row)
 	}
 
